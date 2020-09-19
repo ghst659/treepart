@@ -46,8 +46,8 @@ def dfs(top):
 def pardfs(top, max_weight):
   partitions = []
   current_partition = []
-  stack = [("/", top)]
   remaining_space = max_weight
+  stack = [("/", top)]
   while stack:
     current_name, current = stack.pop()
     if current.weight <= remaining_space:
@@ -60,7 +60,8 @@ def pardfs(top, max_weight):
     else:
       for c in reversed(sorted(current.child_names())):
         stack.append((os.path.join(current_name, c), current.child(c)))
-  partitions.append(current_partition)
+  if current_partition:
+    partitions.append(current_partition)
   return partitions
 
 def build(linestream):
