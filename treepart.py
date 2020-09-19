@@ -18,7 +18,7 @@ class TreeNode:
     self._weight = new_weight
 
   def child_names(self):
-    return sorted(self._children.keys())
+    return self._children.keys()
   
   def child(self, name):
     return self._children.get(name, None)
@@ -58,7 +58,7 @@ def pardfs(top, max_weight):
         current_partition = []
         remaining_space = max_weight
     else:
-      for c in reversed(current.child_names()):
+      for c in reversed(sorted(current.child_names())):
         stack.append((os.path.join(current_name, c), current.child(c)))
   partitions.append(current_partition)
   return partitions
