@@ -2,6 +2,7 @@
 
 import collections
 import os
+import queue
 import sys
 
 def build(linestream, include_leaf=True):
@@ -37,16 +38,27 @@ class TreeNode:
     if include_leaf or len(parts) > 1:
       self._children[parts[0]].add_leaf(parts[1:], include_leaf=include_leaf)
 
-  def dfs(self, starting_name, visit_then_descend):
+  def depth_first(self, starting_name, visit_then_descend):
     """Depth-first visits the tree."""
-    stack = [(starting_name, self)]
-    while stack:
-      current_name, current = stack.pop()
-      if visit_then_descend(current_name, current):
-        for c in reversed(sorted(current.child_names())):
-          stack.append((os.path.join(current_name, c), current.child(c)))
+    nodes = queue.LifoQueue()
+    nodes.put((starting_name, self))
+    while not nodes.empty():
+      node_name, node = nodes.get()
+      if visit_then_descend(node_name, node):
+        for c in reversed(sorted(node.child_names())):
+          nodes.put((os.path.join(node_name, c), node.child(c)))
+
+  def breadth_first(self, starting_name, visit_then_descend):
+    """Breadth-first visits the tree."""
+    nodes = queue.Queue()
+    nodes.put((starting_name, self))
+    while not nodes.empty():
+      node_name, node = nodes.get()
+      if visit_then_descend(node_name, node):
+        for c in sorted(node.child_names()):
+          nodes.put((os.path.join(node_name, c), node.child(c)))
         
-def print(top, file=sys.stdout):
+def dfs_print(top, top_name, file=sys.stdout):
   """Prints the tree out."""
   outfile = file
   def visitor(current_name, current):
@@ -55,7 +67,18 @@ def print(top, file=sys.stdout):
     prefix = "  " * depth
     outfile.write(f"{prefix}{current_name} {current.weight}\n")
     return True
-  top.dfs("/", visitor)
+  top.depth_first(top_name, visitor)
+
+def bfs_print(top, top_name, file=sys.stdout):
+  """Prints the tree out."""
+  outfile = file
+  def visitor(current_name, current):
+    nonlocal outfile
+    depth = current_name.count("/") - 1
+    prefix = "  " * depth
+    outfile.write(f"{prefix}{current_name} {current.weight}\n")
+    return True
+  top.breadth_first(top_name, visitor)
 
 def partition(top, max_weight):
   """Partition the tree TOP into subtrees with MAX_WEIGHT per subtree."""
@@ -75,7 +98,7 @@ def partition(top, max_weight):
         remaining_space = max_weight
       return False  # do not go down the tree
     return True  # go down the tree.
-  top.dfs("/", visit_then_descend)
+  top.depth_first("/", visit_then_descend)
   if current_partition:
     partitions.append(current_partition)
   return partitions

@@ -10,15 +10,19 @@ def main(argv):
   parser = argparse.ArgumentParser(description="tree partition demo.")
   parser.add_argument("--size", metavar="N", type=int, default=100,
                       dest="size", help="Partition target size.")
-  parser.add_argument("--print", dest="print", action="store_true",
-                      help="If true, prints the tree.")
+  parser.add_argument("--dfs", dest="dfs", action="store_true",
+                      help="If true, prints the tree depth-first.")
+  parser.add_argument("--bfs", dest="bfs", action="store_true",
+                      help="If true, prints the tree breadth-first.")
   parser.add_argument("files", metavar="FILE", nargs="*",
                       help="Files to process.")
   args = parser.parse_args(argv[1:])
   with fileinput.input(args.files) as instream:
     root = treepart.build(instream)
-  if args.print:
-    treepart.print(root)
+  if args.dfs:
+    treepart.dfs_print(root, "/")
+  if args.bfs:
+    treepart.bfs_print(root, "/")
   if args.size > 0:
     parts = treepart.partition(root, args.size)
     i = 0
