@@ -23,15 +23,16 @@ class TreeNode:
   def child(self, name):
     return self._children.get(name, None)
 
-  def add(self, parts):
+  def add_leaf(self, parts, include_leaf=True):
     self._weight += 1
     if not parts:
       return
-    self._children[parts[0]].add(parts[1:])
+    if include_leaf or len(parts) > 1:
+      self._children[parts[0]].add_leaf(parts[1:])
 
   def print(self, path, depth=0, file=sys.stdout):
     prefix = "  " * depth
-    print(f"{prefix}{path} {self._weight}")
+    print(f"{prefix}{path} {self._weight}", file=file)
     for child, child_node in sorted(self._children.items()):
       child_node.print(os.path.join(path, child), depth=depth + 1, file=file)
 
@@ -70,7 +71,7 @@ def build(linestream):
     if not line.startswith("/"):
       continue
     line_parts = line.strip().lstrip("/").split("/")
-    top.add(line_parts)
+    top.add_leaf(line_parts)
   return top
 
 # Local Variables:
