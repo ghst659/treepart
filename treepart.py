@@ -28,7 +28,7 @@ class TreeNode:
     if not parts:
       return
     if include_leaf or len(parts) > 1:
-      self._children[parts[0]].add_leaf(parts[1:])
+      self._children[parts[0]].add_leaf(parts[1:], include_leaf=include_leaf)
 
   def print(self, path, depth=0, file=sys.stdout):
     prefix = "  " * depth
@@ -65,13 +65,13 @@ def pardfs(top, max_weight):
     partitions.append(current_partition)
   return partitions
 
-def build(linestream):
+def build(linestream, include_leaf=True):
   top = TreeNode()
   for line in linestream:
     if not line.startswith("/"):
       continue
     line_parts = line.strip().lstrip("/").split("/")
-    top.add_leaf(line_parts)
+    top.add_leaf(line_parts, include_leaf=include_leaf)
   return top
 
 # Local Variables:

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import io
 import textwrap
 import unittest
@@ -5,7 +7,7 @@ import unittest
 import treepart
 
 class TestBuild(unittest.TestCase):
-  def test_build_hierarchy(self):
+  def test_build_with_leaves(self):
     lines = [
       "/foo/bar/baz",
       "/foo/mumble",
@@ -19,6 +21,21 @@ class TestBuild(unittest.TestCase):
     self.assertEqual(got.child("foo").child("bar").weight, 1)
     self.assertEqual(sorted(got.child("foo").child("bar").child_names()),
                      ["baz"])
+
+  def test_build_no_leaves(self):
+    lines = [
+      "/foo/bar/baz",
+      "/foo/mumble",
+    ]
+    got = treepart.build(lines, include_leaf=False)
+    self.assertEqual(got.weight, 2)
+    self.assertEqual(sorted(got.child_names()), ["foo"])
+    self.assertEqual(got.child("foo").weight, 2)
+    self.assertEqual(sorted(got.child("foo").child_names()),
+                     ["bar"])
+    self.assertEqual(got.child("foo").child("bar").weight, 1)
+    self.assertEqual(sorted(got.child("foo").child("bar").child_names()),
+                     [])
 
   def test_print(self):
     lines = [
@@ -43,7 +60,6 @@ class TestBuild(unittest.TestCase):
 
 if __name__ == "__main__":
   unittest.main()
-
 
 # Local Variables:
 # python-indent-offset: 2
