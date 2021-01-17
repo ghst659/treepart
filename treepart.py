@@ -58,6 +58,14 @@ class TreeNode:
         for c in sorted(node.child_names()):
           nodes.put((os.path.join(node_name, c), node.child(c)))
         
+  def regex(self, name):
+    """Returns a regex for the node and its children"""
+    if not self._children:
+      return name
+    items = [self._children[c].regex(c) for c in self._children]
+    itemtext = "(" + "|".join(items) + ")" if len(items) > 1 else items[0]
+    return os.path.join(name, itemtext)
+
 def dfs_print(top, top_name, file=sys.stdout):
   """Prints the tree out."""
   outfile = file

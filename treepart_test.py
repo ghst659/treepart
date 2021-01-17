@@ -45,18 +45,27 @@ class TestBuild(unittest.TestCase):
     ]
     top = treepart.build(lines)
     with io.StringIO() as got_buf:
-      top.print("/", file=got_buf)
+      treepart.dfs_print(top, "/", file=got_buf)
       got = got_buf.getvalue()
     self.assertEqual(got,
                      textwrap.dedent("""\
                      / 3
-                       /fig 1
-                         /fig/leaf 1
-                       /the 2
-                         /the/cascades 1
-                         /the/easy 1
-                           /the/easy/winners 1
+                     /fig 1
+                       /fig/leaf 1
+                     /the 2
+                       /the/cascades 1
+                       /the/easy 1
+                         /the/easy/winners 1
                      """))
+
+  def test_regex(self):
+    root = treepart.build([
+      "/know/slim/foo",
+      "/know/pat/bar",
+      "/know/pat/barf"
+    ])
+    got = root.regex("/")
+    self.assertEqual(got, "/know/(slim/foo|pat/(bar|barf))")
 
 if __name__ == "__main__":
   unittest.main()
