@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pytype: disable=attribute-error
 
 import io
 import textwrap
@@ -12,7 +13,7 @@ class TestBuild(unittest.TestCase):
       "/foo/bar/baz",
       "/foo/mumble",
     ]
-    got = treepart.build(lines)
+    got: treepart.TreeNode = treepart.build(lines)
     self.assertEqual(got.weight, 2)
     self.assertEqual(sorted(got.child_names()), ["foo"])
     self.assertEqual(got.child("foo").weight, 2)
@@ -27,7 +28,7 @@ class TestBuild(unittest.TestCase):
       "/foo/bar/baz",
       "/foo/mumble",
     ]
-    got = treepart.build(lines, include_leaf=False)
+    got: treepart.TreeNode = treepart.build(lines, include_leaf=False)
     self.assertEqual(got.weight, 2)
     self.assertEqual(sorted(got.child_names()), ["foo"])
     self.assertEqual(got.child("foo").weight, 2)
@@ -43,7 +44,7 @@ class TestBuild(unittest.TestCase):
       "/the/cascades",
       "/the/easy/winners",
     ]
-    top = treepart.build(lines)
+    top: treepart.TreeNode = treepart.build(lines)
     with io.StringIO() as got_buf:
       treepart.dfs_print(top, "/", file=got_buf)
       got = got_buf.getvalue()
